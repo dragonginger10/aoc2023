@@ -18,6 +18,14 @@
       overlays = [ (self: super: { go = super."go_1_${toString goVersion}"; }) ];
       pkgs = import nixpkgs { inherit overlays system; };
       
+        aoc-load = pkgs.writeShellScriptBin "aoc-load" ''
+            if [ $1 ]
+            then
+                curl --cookie "session=$AOC_COOKIE" https://adventofcode.com/$1/day/$2/input > in.txt
+            else
+                curl --cookie "session=$AOC_COOKIE" `date +https://adventofcode.com/%Y/day/%d/input` > in.txt
+            fi
+        '';
     in
     {
       formatter.default = pkgs.alejandra;
@@ -26,20 +34,12 @@
           go
           gotools
           golangci-lint
+          aoc-load
         ];
 
         shellHook = ''
           ${pkgs.go}/bin/go version
           source ./secrets
-
-          function aoc-load () {
-            if [ $1 ]
-            then
-                curl --cookie "session=$AOC_COOKIE" https://adventofcode.com/$1/day/$1/input > in.txt
-            else
-                curl --cookie "session=$AOC_COOKIE" `date +https://adventofcode.com/%Y/day/%d/input` > in.txt
-            fi
-          }
         '';
       };
     });
