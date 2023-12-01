@@ -6,29 +6,26 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs =
-    { self
-    , nixpkgs
-    , flake-utils
-    }:
-
-    flake-utils.lib.eachDefaultSystem (system:
-    let
+  outputs = {
+    self,
+    nixpkgs,
+    flake-utils,
+  }:
+    flake-utils.lib.eachDefaultSystem (system: let
       goVersion = 21;
-      overlays = [ (self: super: { go = super."go_1_${toString goVersion}"; }) ];
-      pkgs = import nixpkgs { inherit overlays system; };
-      
-        aoc-load = pkgs.writeShellScriptBin "aoc-load" ''
-            if [ $1 ]
-            then
-                curl --cookie "session=$AOC_COOKIE" https://adventofcode.com/$1/day/$2/input > in.txt
-            else
-                curl --cookie "session=$AOC_COOKIE" `date +https://adventofcode.com/%Y/day/%d/input` > in.txt
-            fi
-        '';
-    in
-    {
-      formatter.default = pkgs.alejandra;
+      overlays = [(self: super: {go = super."go_1_${toString goVersion}";})];
+      pkgs = import nixpkgs {inherit overlays system;};
+
+      aoc-load = pkgs.writeShellScriptBin "aoc-load" ''
+        if [ $1 ]
+        then
+            curl --cookie "session=$AOC_COOKIE" https://adventofcode.com/$1/day/$2/input > in.txt
+        else
+            curl --cookie "session=$AOC_COOKIE" `date +https://adventofcode.com/%Y/day/%d/input` > in.txt
+        fi
+      '';
+    in {
+      formatter = pkgs.alejandra;
       devShells.default = pkgs.mkShellNoCC {
         packages = with pkgs; [
           go
