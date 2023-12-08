@@ -96,6 +96,36 @@ func handToInt(hand string) []int {
     return list
 }
 
+func replaceJ(hand string) []string {
+    possibleHands := make([]string, 0)
+    cards := "23456789TQKA"
+
+    for _, c := range cards {
+        newHand := strings.ReplaceAll(hand, "J", string(c))
+        possibleHands = append(possibleHands, newHand)
+    }
+    return possibleHands
+}
+
+func bestHand(hands []string) int {
+    handsRanked := make(map[int]string, 0)
+    keys := make([]int, 0)
+
+    for _, h := range hands {
+        rank := parseHandValue(h)
+        handsRanked[rank] = h
+    }
+
+    for k := range handsRanked {
+        keys = append(keys, k)
+    }
+    sort.Slice(keys, func(i, j int) bool {
+        return keys[i] > keys[j]
+    })
+
+    return keys[0]
+}
+
 func main() {
 	var answer int64
     var bid int64
@@ -110,11 +140,17 @@ func main() {
 		handBid := strings.Split(line, " ")
 		hand := handBid[0]
 		bid, _ = strconv.ParseInt(handBid[1], 10, 64)
+        value := parseHandValue(hand)
+
+        if strings.Contains(hand, "J") {
+            possibleHands := replaceJ(hand)
+            value = bestHand(possibleHands)
+        }
 
         handRanking = append(handRanking, handInfo{
             hand: hand,
             handNum: handToInt(hand),
-            handValue: parseHandValue(hand),
+            handValue: value,
             bid: int(bid),
         })
 	}
