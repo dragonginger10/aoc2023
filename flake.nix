@@ -32,6 +32,8 @@
           gotools
           golangci-lint
           aoc-load
+          gopls
+          delve
         ];
 
         shellHook = ''
