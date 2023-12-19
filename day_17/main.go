@@ -79,8 +79,8 @@ func main() {
 	heap.Init(pq)
 	directions := [][]int{
 		{0, 1},
-		{1, 0},
 		{0, -1},
+		{1, 0},
 		{-1, 0},
 	}
 	grid := ReadInput(os.Args[1])
@@ -91,10 +91,6 @@ func main() {
 			rowList = append(rowList, parseToInt(ch))
 		}
 		numbers = append(numbers, rowList)
-	}
-
-	for _, r := range numbers {
-		fmt.Println(r)
 	}
 
 	heap.Push(pq, &blockInfo{
@@ -108,7 +104,6 @@ func main() {
 
 	for pq.Len() > 0 {
 		cb := heap.Pop(pq).(*blockInfo)
-		fmt.Println(cb)
 
 		if cb.row == len(numbers)-1 && cb.column == len(numbers[0])-1 {
 			fmt.Println(cb.heatLoss)
@@ -138,11 +133,13 @@ func main() {
 
 			c := 1
 			if cb.dr == nrd && cb.dc == ncd {
-				c = cb.steps + 1
+				c += cb.steps
 			}
 			if c > 3 {
 				continue
 			}
+
+			fmt.Println(newRow, newColumn)
 
 			heap.Push(pq, &blockInfo{
 				heatLoss: cb.heatLoss + numbers[newRow][newColumn],
