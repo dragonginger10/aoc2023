@@ -74,6 +74,8 @@ func parseToInt(r rune) int {
 
 func main() {
 	var numbers [][]int
+	min := 4
+	max := 10
 	visited := make(map[string]bool)
 	pq := &PriorityQueue{}
 	heap.Init(pq)
@@ -105,7 +107,7 @@ func main() {
 	for pq.Len() > 0 {
 		cb := heap.Pop(pq).(*blockInfo)
 
-		if cb.row == len(numbers)-1 && cb.column == len(numbers[0])-1 {
+		if cb.row == len(numbers)-1 && cb.column == len(numbers[0])-1 && cb.steps >= min {
 			fmt.Println(cb.heatLoss)
 			break
 		}
@@ -127,19 +129,21 @@ func main() {
 			if 0 > newRow || newRow > len(numbers)-1 || 0 > newColumn || newColumn > len(numbers[0])-1 {
 				continue
 			}
-			if cb.dr != -nrd && cb.dc != -ncd {
+			if cb.dr == -nrd && cb.dc == -ncd {
 				continue
 			}
 
 			c := 1
 			if cb.dr == nrd && cb.dc == ncd {
 				c += cb.steps
+			} else {
+				if cb.steps < min && !(cb.row == 0 && cb.column == 0) {
+					continue
+				}
 			}
-			if c > 3 {
+			if c > max {
 				continue
 			}
-
-			fmt.Println(newRow, newColumn)
 
 			heap.Push(pq, &blockInfo{
 				heatLoss: cb.heatLoss + numbers[newRow][newColumn],
